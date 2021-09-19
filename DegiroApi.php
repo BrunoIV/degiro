@@ -149,6 +149,35 @@ class DegiroApi {
 	}
 
 
+	/**
+	 * Get the information of an array of products using their id's
+	 * @param $ids - Array of integers
+	 * @return Array with the info of products
+	 */
+	public function getArrayProducts($ids) {
+		$url = "https://trader.degiro.nl/product_search/secure/v5/products/info?intAccount=" . $this->config->getIntAccount(). "&sessionId=" . $this->config->getSessionId();
+		$ch = curl_init($url);
+
+		$headers = array(
+			'Content-Type: application/json;charset=UTF-8'
+		);
+
+		curl_setopt_array($ch, [
+			CURLOPT_HTTPHEADER		=> $headers,
+			CURLOPT_POSTFIELDS		=> json_encode($ids),
+			CURLOPT_POST			=> true,
+			CURLOPT_RETURNTRANSFER	=> true
+		]);
+
+		$result = curl_exec($ch);
+		$result = json_decode($result,true);
+		$this->isValidResult($result);
+
+		curl_close($ch);
+		return $result['data'];
+	}
+
+
 	private function isValidResult($result) {
 		if($result != json_decode(json_encode($result), true)){
 			$this->debug("Invalid JSON");
