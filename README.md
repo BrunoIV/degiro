@@ -1,0 +1,2 @@
+# degiro
+Unofficial degiro API
