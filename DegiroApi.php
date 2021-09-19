@@ -126,6 +126,28 @@ class DegiroApi {
 	}
 
 
+	/**
+	 * Get a list with the ids of the products marked as favorite
+	 * https://trader.degiro.nl/trader/#/favourites/1153120
+	 */
+	public function getFavoritesIds() {
+		$url = "https://trader.degiro.nl/pa/secure/favourites/lists?" . $this->config->getIntAccount() . "&sessionId=" . $this->config->getSessionId();
+		$ch = curl_init();
+
+		curl_setopt_array($ch, [
+			CURLOPT_URL		=> $url,
+			CURLOPT_RETURNTRANSFER	=> true
+		]);
+
+		$result = curl_exec($ch);
+		$result = json_decode($result,true);
+		$this->isValidResult($result);
+		curl_close($ch);
+
+		//FIXME: In the position 1, 2, 3 is your own favs lists
+		return $result['data'][0]['productIds'];
+	}
+
 
 	private function isValidResult($result) {
 		if($result != json_decode(json_encode($result), true)){
