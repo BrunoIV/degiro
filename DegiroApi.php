@@ -171,10 +171,40 @@ class DegiroApi {
 
 		$result = curl_exec($ch);
 		$result = json_decode($result,true);
-		$this->isValidResult($result);
+		$valid = $this->isValidResult($result);
 
 		curl_close($ch);
-		return $result['data'];
+		return ($valid == true ? $result['data'] : []);
+	}
+
+	public function getTransactions($fromDate = null, $toDate = null) {
+		if($toDate == null) {
+			$toDate = date("d/m/Y");
+		}
+
+		if($fromDate == null) {
+			$fromDate = date('d/m/Y', strtotime('-1 months', strtotime($toDate)));
+		}
+
+
+		$url = "https://trader.degiro.nl/reporting/secure/v4/transactions?fromDate=". urlencode($fromDate) . "&toDate=" . $toDate . "&groupTransactionsByOrder=false&intAccount=" . $this->config->getIntAccount() . "&sessionId=" . $this->config->getSessionId();
+		$ch = curl_init($url);
+
+		$headers = array(
+			'Content-Type: application/json;charset=UTF-8'
+		);
+
+		curl_setopt_array($ch, [
+			CURLOPT_HTTPHEADER		=> $headers,
+			CURLOPT_RETURNTRANSFER	=> true
+		]);
+
+		$result = curl_exec($ch);
+		$result = json_decode($result,true);
+		$valid = $this->isValidResult($result);
+
+		curl_close($ch);
+		return ($valid == true ? $result['data'] : []);
 	}
 
 
